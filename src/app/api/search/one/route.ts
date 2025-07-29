@@ -12,12 +12,14 @@ export async function GET(request: Request) {
   const resourceId = searchParams.get('resourceId');
 
   if (!query || !resourceId) {
-    const cacheTime = getCacheTime();
+    const cacheTime = await getCacheTime();
     return NextResponse.json(
       { result: null, error: '缺少必要参数: q 或 resourceId' },
       {
         headers: {
-          'Cache-Control': `public, max-age=${cacheTime}`,
+          'Cache-Control': `public, max-age=${cacheTime}, s-maxage=${cacheTime}`,
+          'CDN-Cache-Control': `public, s-maxage=${cacheTime}`,
+          'Vercel-CDN-Cache-Control': `public, s-maxage=${cacheTime}`,
         },
       }
     );
@@ -40,7 +42,7 @@ export async function GET(request: Request) {
 
     const results = await searchFromApi(targetSite, query);
     const result = results.filter((r) => r.title === query);
-    const cacheTime = getCacheTime();
+    const cacheTime = await getCacheTime();
 
     if (result.length === 0) {
       return NextResponse.json(
@@ -55,7 +57,9 @@ export async function GET(request: Request) {
         { results: result },
         {
           headers: {
-            'Cache-Control': `public, max-age=${cacheTime}`,
+            'Cache-Control': `public, max-age=${cacheTime}, s-maxage=${cacheTime}`,
+            'CDN-Cache-Control': `public, s-maxage=${cacheTime}`,
+            'Vercel-CDN-Cache-Control': `public, s-maxage=${cacheTime}`,
           },
         }
       );

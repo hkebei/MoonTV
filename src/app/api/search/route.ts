@@ -15,7 +15,9 @@ export async function GET(request: Request) {
       { results: [] },
       {
         headers: {
-          'Cache-Control': `public, max-age=${cacheTime}`,
+          'Cache-Control': `public, max-age=${cacheTime}, s-maxage=${cacheTime}`,
+          'CDN-Cache-Control': `public, s-maxage=${cacheTime}`,
+          'Vercel-CDN-Cache-Control': `public, s-maxage=${cacheTime}`,
         },
       }
     );
@@ -27,13 +29,15 @@ export async function GET(request: Request) {
   try {
     const results = await Promise.all(searchPromises);
     const flattenedResults = results.flat();
-    const cacheTime = getCacheTime();
+    const cacheTime = await getCacheTime();
 
     return NextResponse.json(
       { results: flattenedResults },
       {
         headers: {
-          'Cache-Control': `public, max-age=${cacheTime}`,
+          'Cache-Control': `public, max-age=${cacheTime}, s-maxage=${cacheTime}`,
+          'CDN-Cache-Control': `public, s-maxage=${cacheTime}`,
+          'Vercel-CDN-Cache-Control': `public, s-maxage=${cacheTime}`,
         },
       }
     );
